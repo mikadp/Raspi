@@ -5,7 +5,7 @@ import (
 )
 
 func readTemp() (float64, error) {
-
+	return temp
 }
 
 func main() {
