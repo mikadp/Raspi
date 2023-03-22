@@ -13,6 +13,8 @@ import (
 const (
 	dht22PulseTimeout = 200 * time.Microsecond
 	dht22MaxDuration  = 250 * time.Microsecond
+	windowSize        = 60 //amount of temps to store
+	threshold         = 2  // Temp change threshold
 )
 
 func readDHT22(pin string) (float32, float32, error) {
@@ -69,13 +71,52 @@ func readDHT22(pin string) (float32, float32, error) {
 }
 
 func main() {
-	pin := "GPIO22" // Change this to the appropriate GPIO pin number
+	tempretureWindow := [windowSize]float32{}
+	currentIndex := 0
+	currentHighest := float32(-50)
+	currentLowest := float32(250)
 
-	temp, humidity, err := readDHT22(pin)
-	if err != nil {
-		log.Fatalf("Error reading temperature and humidity: %v", err)
+	pin := "GPIO22" // GPIO pin number
+
+	for {
+		temp, humidity, err := readDHT22(pin)
+		if err != nil {
+			log.Fatalf("Error reading temperature and humidity: %v", err)
+		}
+
+		tempretureWindow[currentIndex] = temp
+		currentIndex = (currentIndex + 1) % windowSize
+
+		oldIndex := (currentIndex - windowSize/2 + windowSize) % windowSize
+		diff := tempretureWindow[currentIndex] - tempretureWindow[oldIndex]
+
+		//Comparing temperature changes
+		if diff > threshold {
+			fmt.Println("Temp rising fast")
+		} else if diff < threshold {
+			fmt.Println("Temprature falling fast")
+		} else {
+			return
+		}
+
+		//Update temp to currentHighest and lowest
+		currentHighest := temp
+		currentLowest := temp
+
+		//update currentLowest if temp is lower
+		if temp < currentLowest {
+			currentLowest = temp
+		}
+		//update currentHighes if temp is higher
+		if temp > currentHighest {
+			currentHighest = temp
+		}
+
+		fmt.Printf("Temperature: %.2f°C\n", temp)
+		fmt.Printf("Humidity: %.2f%%\n", humidity)
+
+		time.Sleep(1 * time.Minute) //waits 1 minute befor reading again
+
 	}
 
-	fmt.Printf("Temperature: %.2f°C\n", temp)
-	fmt.Printf("Humidity: %.2f%%\n", humidity)
 }
