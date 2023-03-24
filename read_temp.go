@@ -10,6 +10,19 @@ import (
 	"periph.io/x/conn/v3/gpio/gpioreg"
 )
 
+/* add redis for phonenumbers etc
+var rdb *redis.Client
+
+func init() {
+	// Connect to Redis
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+}
+*/
+
 const (
 	dht22PulseTimeout = 200 * time.Microsecond
 	dht22MaxDuration  = 250 * time.Microsecond
