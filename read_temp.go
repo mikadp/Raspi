@@ -19,7 +19,8 @@ const (
 )
 
 // add redis for phonenumbers etc
-// var rdb *redis.Client
+var rdb *redis.Client
+
 func setRedis() {
 	// Connect to Redis
 	rdb = redis.NewClient(&redis.Options{
@@ -28,6 +29,7 @@ func setRedis() {
 		DB:       0,  // use default DB
 	})
 }
+
 func readDHT22(pin string) (float32, float32, error) {
 	p := gpioreg.ByName(pin)
 	if p == nil {
@@ -89,6 +91,12 @@ func main() {
 
 	pin := "GPIO22" // GPIO pin number
 
+	setRedis()
+	phoneNumber, err := rdb.Get("phone_number").Result()
+	if err != nil {
+		log.Fatalf("Error getting phone number from Redis: %v", err)
+	}
+
 	for {
 		temp, humidity, err := readDHT22(pin)
 		if err != nil {
@@ -103,16 +111,14 @@ func main() {
 
 		//Comparing temperature changes
 		if diff > threshold {
-			fmt.Println("Temp rising fast")
+			communication.SendMessage(fmt.Sprintf("Temperature rising fast: %.2f°C", temp), phoneNumber)
 		} else if diff < threshold {
-			fmt.Println("Temprature falling fast")
-		} else {
-			return
+			communication.SendMessage(fmt.Sprintf("Temperature falling fast: %.2f°C", temp), phoneNumber)
 		}
 
 		//Update temp to currentHighest and lowest
-		currentHighest := temp
-		currentLowest := temp
+		currentHighest = temp
+		currentLowest = temp
 
 		//update currentLowest if temp is lower
 		if temp < currentLowest {
@@ -127,7 +133,6 @@ func main() {
 		fmt.Printf("Humidity: %.2f%%\n", humidity)
 
 		time.Sleep(1 * time.Minute) //waits 1 minute befor reading again
-
 	}
 
 }
