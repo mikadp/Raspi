@@ -6,22 +6,10 @@ import (
 	"log"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/conn/v3/gpio/gpioreg"
 )
-
-/* add redis for phonenumbers etc
-var rdb *redis.Client
-
-func init() {
-	// Connect to Redis
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-}
-*/
 
 const (
 	dht22PulseTimeout = 200 * time.Microsecond
@@ -30,6 +18,16 @@ const (
 	threshold         = 2  // Temp change threshold
 )
 
+// add redis for phonenumbers etc
+// var rdb *redis.Client
+func setRedis() {
+	// Connect to Redis
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+}
 func readDHT22(pin string) (float32, float32, error) {
 	p := gpioreg.ByName(pin)
 	if p == nil {

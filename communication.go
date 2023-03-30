@@ -12,10 +12,10 @@ func SendMessage(message string, phoneNumber string) {
 	mode := &serial.Mode{
 		BaudRate: 115200,
 		DataBits: 8,
-		StopBits: serial.Stop1,
+		StopBits: serial.OneStopBit,
 		Parity:   serial.NoParity,
 	}
-	port, err := serial.Open(options)
+	port, err := serial.Open("/dev/ttyS0", mode)
 	if err != nil {
 		fmt.Println("Error opening serial port: ", err)
 		return
