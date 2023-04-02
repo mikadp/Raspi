@@ -1,7 +1,8 @@
-//Here make db connection and querys
+// Here make db connection and querys
+package raspi
 
 import (
-	"fmt"
+	"database/sql"
 	"log"
 )
 
