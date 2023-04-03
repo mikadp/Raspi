@@ -131,7 +131,7 @@ func main() {
 		if temp > currentHighest {
 			currentHighest = temp
 		}
-
+		//Print temp
 		fmt.Printf("Temperature: %.2f°C\n", temp)
 		fmt.Printf("Humidity: %.2f%%\n", humidity)
 
