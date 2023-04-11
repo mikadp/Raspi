@@ -123,7 +123,7 @@ func main() {
 		currentHighest = temp
 		currentLowest = temp
 
-		//update currentLowest if temp is lower
+		//update currentLowest if temp is lower than current
 		if temp < currentLowest {
 			currentLowest = temp
 		}
