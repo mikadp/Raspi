@@ -1,0 +1,28 @@
+version: '3'
+services:
+  temp_db:
+    build:
+      context: .
+      dockerfile: dockerfile.database
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${PWD}/data:/var/lib/mysql
+  goapp:
+    build:
+      context: .
+      dockerfile: dockerfile.goapp
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - temp_db
+    ports:
+      - "8080:8080"

@@ -1,2 +1,24 @@
 FROM golang:1.20.2
-WORKDIR /Raspi
+
+#Setting the working dir in the container
+WORKDIR /go/src/app
+
+
+
+# Copy all .go files to the container
+COPY *.go .
+
+# Copy the go.mod and go.sum files to the container
+COPY go.mod .
+COPY go.sum .
+
+# Install any required dependencies
+RUN go get -d -v ./...
+
+# Build the Go app
+RUN go build -o app .
+
+RUN chmod +x ./app
+
+# Set the command to run the Go app
+CMD ["./app"]
