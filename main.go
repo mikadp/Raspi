@@ -1,13 +1,11 @@
 package raspi
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/conn/v3/gpio/gpioreg"
 )
@@ -18,18 +16,6 @@ const (
 	windowSize        = 60 //amount of temps to store
 	threshold         = 2  // Temp change threshold
 )
-
-// add redis for phonenumbers etc
-var rdb *redis.Client
-
-func setRedis() {
-	// Connect to Redis
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-}
 
 func readDHT22(pin string) (float32, float32, error) {
 	p := gpioreg.ByName(pin)
@@ -89,15 +75,16 @@ func main() {
 	currentIndex := 0
 	currentHighest := float32(-50)
 	currentLowest := float32(250)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
 	pin := "GPIO22" // GPIO pin number
 
-	setRedis()
-	phoneNumber, err := rdb.Get(ctx, "phone_number").Result()
+	//set ip db connection
+	setupDatabaseConnection()
+
+	//get phone numbers from the db
+	phoneNumber, err := getPhoneNumbers()
 	if err != nil {
-		log.Fatalf("Error getting phone number from Redis: %v", err)
+		log.Fatalf("Error getting phone numbers: %v", err)
 	}
 
 	for {
