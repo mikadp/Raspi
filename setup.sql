@@ -5,3 +5,9 @@ CREATE TABLE temperature_data (
   daily_lowest FLOAT NOT NULL,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE phone_numbers (
+  id INT NOT NULL AUTO_INCREMENT,
+  phone_number VARCHAR(20) NOT NULL,
+  PRIMARY KEY (id)
+);
