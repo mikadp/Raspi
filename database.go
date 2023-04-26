@@ -46,3 +46,14 @@ func getPhoneNumbers() ([]string, error) {
 
 	return phoneNumbers, nil
 }
+
+func getTelegramAPI() (string, error) {
+	//query the api
+	var botToken string
+	err := db.QueryRow("SELECT botToken FROM telegram")
+	if err != nil {
+		return "", fmt.Errorf("Error loading botToken from database: %v", err)
+	}
+
+	return botToken, nil
+}

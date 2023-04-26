@@ -11,3 +11,8 @@ CREATE TABLE phone_numbers (
   phone_number VARCHAR(20) NOT NULL,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE telegram (
+  id INT NOT NULL AUTO_INCREMENT,
+  botToken VARCHAR(45) NOT NULL 
+);

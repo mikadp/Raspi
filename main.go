@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/conn/v3/gpio/gpioreg"
 )
@@ -14,7 +15,7 @@ const (
 	dht22PulseTimeout = 200 * time.Microsecond
 	dht22MaxDuration  = 250 * time.Microsecond
 	windowSize        = 60 //amount of temps to store
-	threshold         = 2  // Temp change threshold
+	threshold         = 5  // Temp change threshold
 )
 
 func readDHT22(pin string) (float32, float32, error) {
@@ -70,6 +71,12 @@ func readDHT22(pin string) (float32, float32, error) {
 	return float32(temperature) / 10, float32(humidity) / 10, nil
 }
 
+func sendTelegramMessage(bot *tgbotapi.BotAPI, chatID, int64, message string) error {
+	msg := tgbotapi.NewMessage(chatID, message)
+	_, err := bot.Send(msg)
+	return err
+}
+
 func main() {
 	tempretureWindow := [windowSize]float32{}
 	currentIndex := 0
@@ -87,6 +94,15 @@ func main() {
 		log.Fatalf("Error getting phone numbers: %v", err)
 	}
 
+	// Initilizing Telegram bot
+	botToken, err := getTelegramAPI()
+	if err != nil {
+		log.Fatalf("Error loading Telegram API: %v", err)
+	}
+
+	var chatID int64 = 123456
+	bot, err := tgbotapi.NewBotAPI(botToken)
+
 	for {
 		temp, humidity, err := readDHT22(pin)
 		if err != nil {
@@ -101,9 +117,9 @@ func main() {
 
 		//Comparing temperature changes
 		if diff > threshold {
-			SendMessage(fmt.Sprintf("Temperature rising fast: %.2f°C", temp), phoneNumber)
+			SendMessage(fmt.Sprintf("Temperature rising fast: %.2f°C", temp), phoneNumber[0])
 		} else if diff < threshold {
-			SendMessage(fmt.Sprintf("Temperature falling fast: %.2f°C", temp), phoneNumber)
+			SendMessage(fmt.Sprintf("Temperature falling fast: %.2f°C", temp), phoneNumber[0])
 		}
 
 		//Update temp to currentHighest and lowest
