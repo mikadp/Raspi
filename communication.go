@@ -2,10 +2,56 @@ package raspi
 
 import (
 	"fmt"
+	"log"
+	"strings"
 	"time"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	serial "go.bug.st/serial"
 )
+
+// handle Telegram messages
+func handleTelegramMessage(bot *tgbotapi.BotAPI) error {
+	var chatID int64 = 123456 //telegram chat id
+	updates, err := bot.GetUpdatesChan(tgbotapi.UpdateConfig{})
+	if err != nil {
+		return fmt.Errorf("error getting Telegram updates channel: %v", err)
+	}
+
+	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
+
+		chatID := update.Message.Chat.ID
+		messageText := strings.ToLower(update.Message.Text)
+
+		if messageText == "temp" {
+			temperature, _, err := readDHT22("GPIO22")
+			if err != nil {
+				log.Printf("Error reading temperature: %v", err)
+				continue
+			}
+
+			message := fmt.Sprintf("Current temperature: %.2f°C", temperature)
+			err = sendTelegramMessage(bot, chatID, message)
+			if err != nil {
+				log.Printf("Error sending Telegram message: %v", err)
+				continue
+			}
+
+			log.Printf("Telegram message sent successfully: %s", message)
+		}
+	}
+
+	return nil
+}
+
+func sendTelegramMessage(bot *tgbotapi.BotAPI, chatID int64, message string) error {
+	msg := tgbotapi.NewMessage(chatID, message)
+	_, err := bot.Send(msg)
+	return err
+}
 
 func SendMessage(message string, phoneNumber string) {
 	//Serial port opening

@@ -71,12 +71,6 @@ func readDHT22(pin string) (float32, float32, error) {
 	return float32(temperature) / 10, float32(humidity) / 10, nil
 }
 
-func sendTelegramMessage(bot *tgbotapi.BotAPI, chatID, int64, message string) error {
-	msg := tgbotapi.NewMessage(chatID, message)
-	_, err := bot.Send(msg)
-	return err
-}
-
 func main() {
 	tempretureWindow := [windowSize]float32{}
 	currentIndex := 0
@@ -94,20 +88,24 @@ func main() {
 		log.Fatalf("Error getting phone numbers: %v", err)
 	}
 
-	// Initilizing Telegram bot
+	//get token from db
 	botToken, err := getTelegramAPI()
 	if err != nil {
 		log.Fatalf("Error loading Telegram API: %v", err)
 	}
 
-	var chatID int64 = 123456
 	bot, err := tgbotapi.NewBotAPI(botToken)
+	if err != nil {
+		log.Fatalf("Error initializing Telegram bot: %v", err)
+	}
 
 	for {
 		temp, humidity, err := readDHT22(pin)
 		if err != nil {
 			log.Fatalf("Error reading temperature and humidity: %v", err)
 		}
+
+		handleTelegramMessage(bot)
 
 		tempretureWindow[currentIndex] = temp
 		currentIndex = (currentIndex + 1) % windowSize
