@@ -12,7 +12,7 @@ import (
 
 // handle Telegram messages
 func handleTelegramMessage(bot *tgbotapi.BotAPI) error {
-	var chatID int64 = 123456 //telegram chat id
+	//var chatID int64 = 123456 //telegram chat id
 	updates, err := bot.GetUpdatesChan(tgbotapi.UpdateConfig{})
 	if err != nil {
 		return fmt.Errorf("error getting Telegram updates channel: %v", err)
