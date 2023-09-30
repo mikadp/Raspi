@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import serial
+import pyserial as serial
 import time
 
 ser = serial.Serial("/dev/ttyS0",115200)
