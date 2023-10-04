@@ -1,6 +1,6 @@
 module Raspi
 
-go 1.20
+go 1.21.1
 
 require (
 	go.bug.st/serial v1.6.1

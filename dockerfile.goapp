@@ -1,7 +1,8 @@
-FROM golang:1.20.2
+FROM golang:1.21.1
+ENV GOOS=linux GOARCH=arm64
 
 #Setting the working dir in the container
-WORKDIR /go/src/app
+WORKDIR /app
 
 
 
@@ -18,9 +19,9 @@ RUN go mod download
 RUN go get -d -v ./...
 
 # Build the Go app
-RUN go build -o app .
+RUN go build -o raspiapp 
 
 RUN chmod +x ./app
 
 # Set the command to run the Go app
-CMD ["./app"]
+CMD ["/raspiapp"]
