@@ -1,10 +1,7 @@
-FROM golang:1.21.1
-ENV GOOS=linux GOARCH=arm64
+FROM arm64v8/debian:buster
 
 #Setting the working dir in the container
 WORKDIR /app
-
-
 
 # Copy all .go files to the container
 COPY *.go .
@@ -16,12 +13,10 @@ COPY go.sum .
 RUN go mod download
 
 # Install any required dependencies
-RUN go get -d -v ./...
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go get -d -v ./...
 
 # Build the Go app
 RUN go build -o raspiapp 
 
-RUN chmod +x ./app
-
 # Set the command to run the Go app
-CMD ["/raspiapp"]
+CMD ["./raspiapp"]

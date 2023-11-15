@@ -1,6 +1,6 @@
 module Raspi
 
-go 1.21.1
+go 1.23
 
 require (
 	go.bug.st/serial v1.6.1
@@ -10,7 +10,7 @@ require (
 require (
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 )
 
 require github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
