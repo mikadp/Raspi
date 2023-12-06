@@ -10,13 +10,14 @@ COPY *.go .
 COPY go.mod .
 COPY go.sum .
 
+RUN apt-get update && apt-get install -y 
 RUN go mod download
 
 # Install any required dependencies
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go get -d -v ./...
+RUN go get -d -v ./...
 
 # Build the Go app
-RUN go build -o raspiapp 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o raspiapp 
 
 # Set the command to run the Go app
 CMD ["./raspiapp"]
