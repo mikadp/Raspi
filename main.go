@@ -124,6 +124,9 @@ func main() {
 		currentHighest = temp
 		currentLowest = temp
 
+		//tähän voisi lisätä haun ilmatieteenlaitoksen avoimesta datasta
+		//hakee kerran päivässä keskilämpötilan tai vastaavaa ja lisäisi kantaan
+
 		//update currentLowest if temp is lower than current
 		if temp < currentLowest {
 			currentLowest = temp
