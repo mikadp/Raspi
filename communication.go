@@ -26,14 +26,14 @@ func handleTelegramMessage(bot *tgbotapi.BotAPI) error {
 		chatID := update.Message.Chat.ID
 		messageText := strings.ToLower(update.Message.Text)
 
-		if messageText == "temp" {
-			temperature, _, err := readDHT22("GPIO22")
+		if messageText == "temp" || messageText == "status" {
+			temperature, humidity, err := readDHT22("GPIO22")
 			if err != nil {
 				log.Printf("Error reading temperature: %v", err)
 				continue
 			}
 
-			message := fmt.Sprintf("Current temperature: %.2f°C", temperature)
+			message := fmt.Sprintf("Current temperature: %.2f°C and humidity: %.2f", temperature, humidity)
 			err = sendTelegramMessage(bot, chatID, message)
 			if err != nil {
 				log.Printf("Error sending Telegram message: %v", err)
