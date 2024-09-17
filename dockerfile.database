@@ -1,4 +1,4 @@
-FROM mysql:8.0
+FROM mysql:8.2.0
 
 # load environment variables from .env file
 ENV MYSQL_DATABASE=$MYSQL_DATABASE

@@ -1,4 +1,4 @@
-FROM arm64v8/debian:buster
+FROM golang:latest
 
 #Setting the working dir in the container
 WORKDIR /app
@@ -10,14 +10,16 @@ COPY *.go .
 COPY go.mod .
 COPY go.sum .
 
-RUN apt-get update && apt-get install -y 
+#RUN apt-get update && apt-get install -y 
 RUN go mod download
 
 # Install any required dependencies
-RUN go get -d -v ./...
+# RUN go get -d -v ./...
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o raspiapp 
+RUN CGO_ENABLED=0 GO111MODULE=on GOARCH=arm GOOS=linux go build -o raspigoapp 
+
 
 # Set the command to run the Go app
-CMD ["./raspiapp"]
+RUN chmod +x raspigoapp
+CMD ["./raspigoapp"]
