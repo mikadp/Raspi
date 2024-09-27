@@ -8,7 +8,8 @@ some notes:
 
 build go app
 
-docker build . -f dockerfile.goapp -t raspigoapp
+docker build -t raspigoapp
+docker run --rm --privileged raspigoapp
 
 
 On raspbian i run following commands to get docker up if raspberry pi restarts
