@@ -1,4 +1,4 @@
-package raspi
+package main
 
 import (
 	"errors"
@@ -72,23 +72,12 @@ func readDHT22(pin string) (float32, float32, error) {
 }
 
 func main() {
-	tempretureWindow := [windowSize]float32{}
-	currentIndex := 0
-	currentHighest := float32(-50)
-	currentLowest := float32(250)
-
-	pin := "GPIO22" // GPIO pin number
-
-	//set ip db connection
 	setupDatabaseConnection()
-
-	//get phone numbers from the db
-	phoneNumber, err := getPhoneNumbers()
+	phoneNumbers, err := getPhoneNumbers()
 	if err != nil {
 		log.Fatalf("Error getting phone numbers: %v", err)
 	}
 
-	//get token from db
 	botToken, err := getTelegramAPI()
 	if err != nil {
 		log.Fatalf("Error loading Telegram API: %v", err)
@@ -99,47 +88,37 @@ func main() {
 		log.Fatalf("Error initializing Telegram bot: %v", err)
 	}
 
-	for {
-		temp, humidity, err := readDHT22(pin)
+	go func() {
+		err = handleTelegramMessage(bot)
 		if err != nil {
-			log.Fatalf("Error reading temperature and humidity: %v", err)
+			log.Printf("Error handling Telegram messages: %v", err)
+		}
+	}()
+
+	pin := "GPIO22"
+	temperatureWindow := make([]float32, windowSize)
+	currentIndex := 0
+
+	for {
+		temp, _, err := readDHT22(pin)
+		if err != nil {
+			log.Printf("Error reading sensor: %v", err)
+			continue
 		}
 
-		handleTelegramMessage(bot)
-
-		tempretureWindow[currentIndex] = temp
+		temperatureWindow[currentIndex] = temp
 		currentIndex = (currentIndex + 1) % windowSize
 
-		oldIndex := (currentIndex - windowSize/2 + windowSize) % windowSize
-		diff := tempretureWindow[currentIndex] - tempretureWindow[oldIndex]
-
-		//Comparing temperature changes
-		if diff > threshold {
-			SendMessage(fmt.Sprintf("Temperature rising fast: %.2f°C", temp), phoneNumber[0])
-		} else if diff < threshold {
-			SendMessage(fmt.Sprintf("Temperature falling fast: %.2f°C", temp), phoneNumber[0])
+		if currentIndex >= threshold {
+			diff := temperatureWindow[currentIndex-1] - temperatureWindow[currentIndex-threshold]
+			if diff > float32(threshold) {
+				SendMessage(fmt.Sprintf("Temperature rising fast: %.2f°C", temp), phoneNumbers[0])
+			} else if diff < -float32(threshold) {
+				SendMessage(fmt.Sprintf("Temperature falling fast: %.2f°C", temp), phoneNumbers[0])
+			}
 		}
 
-		//Update temp to currentHighest and lowest
-		currentHighest = temp
-		currentLowest = temp
-
-		//tähän voisi lisätä haun ilmatieteenlaitoksen avoimesta datasta
-		//hakee kerran päivässä keskilämpötilan tai vastaavaa ja lisäisi kantaan
-
-		//update currentLowest if temp is lower than current
-		if temp < currentLowest {
-			currentLowest = temp
-		}
-		//update currentHighes if temp is higher
-		if temp > currentHighest {
-			currentHighest = temp
-		}
-		//Print temp
 		fmt.Printf("Temperature: %.2f°C\n", temp)
-		fmt.Printf("Humidity: %.2f%%\n", humidity)
-
-		time.Sleep(1 * time.Minute) //waits 1 minute befor reading again
+		time.Sleep(1 * time.Minute)
 	}
-
 }

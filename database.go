@@ -1,5 +1,5 @@
 // Here make db connection and querys
-package raspi
+package main
 
 import (
 	"database/sql"
@@ -16,7 +16,7 @@ func setupDatabaseConnection() {
 	password := os.Getenv("MYSQL_PASSWORD")
 	name := os.Getenv("MYSQL_DATABASE")
 	host := os.Getenv("MYSQL_HOST")
-	port := os.Getenv("ENV MYSQL_PORT")
+	port := os.Getenv("MYSQL_PORT")
 
 	// Create the database connection
 	var err error
@@ -52,7 +52,7 @@ func getTelegramAPI() (string, error) {
 	var botToken string
 	err := db.QueryRow("SELECT botToken FROM telegram")
 	if err != nil {
-		return "", fmt.Errorf("Error loading botToken from database: %v", err)
+		return "", fmt.Errorf("error loading botToken from database: %v", err)
 	}
 
 	return botToken, nil

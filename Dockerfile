@@ -1,7 +1,12 @@
-FROM golang:latest AS builder
+FROM golang:alpine AS builder
 
 # Setting the working directory in the container
 WORKDIR /app
+
+# Install build tools only in the build stage
+ RUN apt-get update 
+ RUN apt-get update && apt-get install -y gcc g++ libc6-dev
+ 
 
 # Copy the go.mod and go.sum files to the container first
 COPY go.mod ./ go.sum ./
@@ -13,13 +18,18 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o raspigoapp
+RUN GOARCH=amd64 go build -o raspigoapp .
+ENV CGO_ENABLED=0  
+#GOOS=linux 
 
 # minimal base image to keep the final image small
 FROM alpine:latest
 
 # Working directory inside the new image
-WORKDIR /app
+WORKDIR /root/
+
+# Install runtime dependencies
+RUN apk add --no-cache libpq
 
 # Copying the compiled binary from the build container
 COPY --from=builder /app/raspigoapp .
