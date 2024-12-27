@@ -1,5 +1,5 @@
 // Here make db connection and querys
-package raspi
+package main
 
 import (
 	"database/sql"
