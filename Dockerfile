@@ -3,6 +3,9 @@ FROM golang:latest AS builder
 # Setting the working directory in the container
 WORKDIR /app
 
+#require libraries for compiling
+RUN apk add --no-cache gcc g++ libc-dev
+
 # Copy the go.mod and go.sum files to the container first
 COPY go.mod ./ go.sum ./
 
@@ -13,7 +16,12 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o raspigoapp
+ENV CGO_ENABLED=0 
+ENV GOARCH=amd64 
+ENV GOOS=linux 
+
+#Build go app
+RUN go build -o raspigoapp
 
 # minimal base image to keep the final image small
 FROM alpine:latest
