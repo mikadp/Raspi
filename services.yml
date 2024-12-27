@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   temp_db:
     build:
@@ -18,7 +18,7 @@ services:
   goapp:
     build:
       context: .
-      dockerfile: dockerfile.goapp
+      dockerfile: Dockerfile
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}

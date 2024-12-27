@@ -4,7 +4,13 @@ FROM golang:latest AS builder
 WORKDIR /app
 
 #require libraries for compiling
-RUN apk add --no-cache gcc g++ libc-dev
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libc-dev \
+    make \
+    wget \
+    curl
 
 # Copy the go.mod and go.sum files to the container first
 COPY go.mod ./ go.sum ./
@@ -17,14 +23,14 @@ COPY . .
 
 # Build the Go app
 ENV CGO_ENABLED=0 
-ENV GOARCH=amd64 
+ENV GOARCH=arm64 
 ENV GOOS=linux 
 
 #Build go app
 RUN go build -o raspigoapp
 
 # minimal base image to keep the final image small
-FROM alpine:latest
+FROM debian:bullseye-slim
 
 # Working directory inside the new image
 WORKDIR /app

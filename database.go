@@ -7,24 +7,31 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 var db *sql.DB
 
 func setupDatabaseConnection() {
 	// Read db username etc from .env
-	user := os.Getenv("MYSQL_USER")
-	password := os.Getenv("MYSQL_PASSWORD")
-	name := os.Getenv("MYSQL_DATABASE")
-	host := os.Getenv("MYSQL_HOST")
-	port := os.Getenv("ENV MYSQL_PORT")
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbName := os.Getenv("POSTGRES_DB")
+	host := os.Getenv("POSTGRES_HOST")
+	port := os.Getenv("POSTGRES_PORT")
 
 	// Create the database connection
 	var err error
-	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, name))
+	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbName)
+	db, err = sql.Open("postgres", connectionString)
 	if err != nil {
 		log.Fatalf("Cannot create the connection: %s", err)
+	}
+
+	//Test connection
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Cannot connect to the database: %s", err)
 	}
 }
 

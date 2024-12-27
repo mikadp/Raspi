@@ -1,18 +1,16 @@
 CREATE TABLE temperature_data (
-  id INT NOT NULL AUTO_INCREMENT,
+  id SERIAL PRIMARY KEY,
   date DATE NOT NULL,
   daily_highest FLOAT NOT NULL,
-  daily_lowest FLOAT NOT NULL,
-  PRIMARY KEY (id)
+  daily_lowest FLOAT NOT NULL
 );
 
 CREATE TABLE phone_numbers (
-  id INT NOT NULL AUTO_INCREMENT,
-  phone_number VARCHAR(20) NOT NULL,
-  PRIMARY KEY (id)
+  id SERIAL PRIMARY KEY,
+  phone_number VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE telegram (
-  id INT NOT NULL AUTO_INCREMENT,
+  id SERIAL PRIMARY KEY,
   botToken VARCHAR(45) NOT NULL 
 );
