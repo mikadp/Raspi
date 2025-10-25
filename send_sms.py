@@ -1,5 +1,31 @@
-import RPi.GPIO as GPIO
-import pyserial as serial
+try:
+	import RPi.GPIO as GPIO  # type: ignore
+	IS_RPI = True
+except (ImportError, RuntimeError):
+	# Provide a minimal mock GPIO for development/testing on non-Raspberry Pi systems
+	IS_RPI = False
+	class GPIO:
+		BCM = 'BCM'
+		HIGH = 1
+		LOW = 0
+		OUT = 'OUT'
+		@staticmethod
+		def setmode(mode):
+			print("MockGPIO: setmode(%s)" % mode)
+		@staticmethod
+		def setwarnings(flag):
+			pass
+		@staticmethod
+		def setup(pin, mode):
+			print("MockGPIO: setup(pin=%s, mode=%s)" % (pin, mode))
+		@staticmethod
+		def output(pin, value):
+			print("MockGPIO: output(pin=%s, value=%s)" % (pin, value))
+		@staticmethod
+		def cleanup():
+			print("MockGPIO: cleanup()")
+
+import serial
 import time
 
 ser = serial.Serial("/dev/ttyS0",115200)
